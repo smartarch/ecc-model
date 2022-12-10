@@ -1,1 +1,3 @@
-# ecc-model
+# Towards a Reference Component Model of Edge-Cloud Continuum
+
+This repository contains our work related to a reference component model for Edge-Cloud Continuum. The `data` directory contains the data from our literature study that was used as a foundation for the concepts and ideas that we put into our reference model. The `model` directory contains the YAML files that show an example of usage of that model.  
