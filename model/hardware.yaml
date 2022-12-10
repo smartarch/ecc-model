@@ -1,0 +1,25 @@
+smartphone:
+  networks:
+    - internet
+    - company_network
+
+smartcar:
+  networks:
+    - company_network
+  capabilities:
+   - MADOPS: 200000
+
+edge_server:
+  networks:
+    - company network
+  capabilities:
+   - MADOPS: 2000000
+
+datacenter:
+  networks:
+    - internet
+    - company_network
+
+smart_sensor:
+  networks:
+    - company_network

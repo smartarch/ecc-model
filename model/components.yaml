@@ -1,0 +1,51 @@
+car_app:
+  functionalities:
+  - steering
+  - location_service
+  - personal_sdp
+  - communication
+  starting_state: urban
+  states:
+  - name: urban
+    transitions:
+    - to: rural
+      condition: sensor_count < sc_threshold && closest_edge_distance > ced_threshold
+  - name: rural
+    functionalities:
+    - environment_sdp
+    transitions:
+    - to: urban
+      condition: sensor_count > sc_threshold || closest_edge_distance < ced_threshold
+
+client_app:
+  functionalities:
+  - route_display
+  - communication
+  starting_state: autonomous
+  states:
+  - name: autonomous
+    functionalities:
+    - location_service
+    transitions:
+    - to: riding
+      condition: communication.input.transition_to_riding
+  - name: riding
+    transitions:
+    - to: autonomous
+    condition: communication.input.transition_to_autonomous
+
+sensor_firmware:
+  functionalities:
+  - sensor_service
+
+sensing_server:
+  functionalities:
+  - environment_sdp
+
+matching_server:
+  functionalities:
+  - matching_service
+
+communication_server:
+  functionalities:
+  - mediation

@@ -1,0 +1,86 @@
+location_service:
+  outputs:
+  - name: location data
+    cardinality: multiple
+    requirements: # input/output-level requirements
+    - network:         # the data generated from this output can be handled only
+        type: private  # over a trusted network
+        owner: company
+
+route_calculation_client:
+  inputs:               # if connected to the location service above, this implies
+  - name: location data # that this component can operate only over a trusted network
+  - name: matching data
+  outputs:           # if connected to the route display below, this implies that
+  - name: client route data # this output must be sent at least every 100 ms
+
+route_display:
+  inputs:
+  - name: route data
+    requirements: # input/output-level requirements
+    - max_latency: 100 ms # the data on the input should not have been generated
+      probability: 0.99   # more than 100 ms ago
+    - max_refresh: 100 ms # new input is required every 100 ms
+      probability: 0.99
+
+environment_sdp:
+  inputs:
+  - name: external_sensor
+    cardinality: multiple
+  outputs:
+  - name: global sensory data
+  requirements: # Functionality-level requirements
+  # Number of multiply-add operations per second required to run this function
+   - MADOPS: 100000 * inputs.external_sensor.count # Dependent on the number
+                                                   # of connected sensors
+
+route_calculation_car:
+  inputs:
+  - name: location data
+  - name: global sensory data
+  - name: matching data
+  outputs:
+  - name: car route data
+    cardinality: 2
+
+personal_sdp:
+  outputs:
+  - name: sensory data
+
+steering:
+  inputs:
+  - name: location service
+    requirements:
+    - max_latency: 0 # means that this input must come from the same component
+  - name: sensory data
+    requirements:
+    - max_latency: 0 # means that this input must come from the same component
+  - name: route
+    requirements:
+    - max_refresh: 1000 # ms
+
+communication:
+  inputs:
+  - name: communication input
+  outputs:
+  - name: communication output
+
+mediation:
+  inputs:
+  - name: communication input
+    cardinality: multiple
+  - name: matching data
+  outputs:
+  - name: communication output
+    cardinality: multiple
+
+sensor_service:
+  outputs:
+  - name: sensory data
+
+matching_service:
+  inputs:
+  - name: client route data
+    cardinality: multiple
+  - name: car route data
+    cardinality: multiple

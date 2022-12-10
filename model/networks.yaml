@@ -1,0 +1,6 @@
+internet:
+  type: public
+
+company_network:
+  type: private
+  owner: Company A
