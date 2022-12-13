@@ -1,25 +1,63 @@
-smartphone:
+# The following 3 hardware node types are networking elements that serve as
+# connection providers for the computing nodes
+
+access_point:
+  owner: Mobile Operator
   networks:
-    - internet
-    - company_network
+    - name: 5G_network
+    - name: internet
+    - name: edge
+
+company_access_point:
+  owner: Company
+  networks:
+    - name: edge
+    - name: internet
+
+cloud_edge_bridge:
+  owner: Company
+  networks:
+    - name: center
+    - name: edge
+
+# The following are the computing nodes
 
 smartcar:
+  owner: Company
   networks:
-    - company_network
+    - name: edge
   capabilities:
    - MADOPS: 200000
+     # Other smartcar HW capabilities description
 
 edge_server:
+  owner: Company
   networks:
-    - company network
+    - name: edge
   capabilities:
    - MADOPS: 2000000
+     # Other edge server HW capabilities description
 
-datacenter:
+smartphone:
+  owner: any
   networks:
-    - internet
-    - company_network
+    - name: 5G_network
+  capabilities:
+    - # Smartphone HW capabilities description
+
+# This node is marked as having essentially unlimited hardware resources.
+# In practice that means that any number of components with any resource
+# requirements can be deployed here. However,
+datacenter:
+  owner: Company
+  unlimited: true
+  networks:
+    - name: internet
+    - name: center
 
 smart_sensor:
+  owner: any
   networks:
-    - company_network
+    - name: edge
+  capabilities:
+    - # Sensor HW description

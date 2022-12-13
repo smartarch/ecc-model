@@ -1,6 +1,14 @@
 internet:
   type: public
 
-company_network:
+5G_network:
+  type: public
+  owner: Mobile Operator
+
+edge:
+  type: private
+  owner: Company A
+
+center:
   type: private
   owner: Company A

@@ -1,22 +1,27 @@
-location_service:
+location_service_car:
   outputs:
-  - name: location data
-    cardinality: multiple
+  - name: car location data
+    cardinality: 2
     requirements: # input/output-level requirements
     - network:         # the data generated from this output can be handled only
         type: private  # over a trusted network
-        owner: company
+        owner: Company
+
+location_service_client:
+  outputs:
+  - name: client location data
+    cardinality: multiple
 
 route_calculation_client:
   inputs:               # if connected to the location service above, this implies
-  - name: location data # that this component can operate only over a trusted network
+  - name: client location data # that this component can operate only over a trusted network
   - name: matching data
   outputs:           # if connected to the route display below, this implies that
   - name: client route data # this output must be sent at least every 100 ms
 
 route_display:
   inputs:
-  - name: route data
+  - name: client route data
     requirements: # input/output-level requirements
     - max_latency: 100 ms # the data on the input should not have been generated
       probability: 0.99   # more than 100 ms ago
@@ -25,7 +30,7 @@ route_display:
 
 environment_sdp:
   inputs:
-  - name: external_sensor
+  - name: sensory data
     cardinality: multiple
   outputs:
   - name: global sensory data
@@ -36,7 +41,7 @@ environment_sdp:
 
 route_calculation_car:
   inputs:
-  - name: location data
+  - name: car location data
   - name: global sensory data
   - name: matching data
   outputs:
@@ -45,42 +50,54 @@ route_calculation_car:
 
 personal_sdp:
   outputs:
-  - name: sensory data
+  - name: local sensory data
 
+# The latency
 steering:
   inputs:
-  - name: location service
+  - name: car location data
     requirements:
     - max_latency: 0 # means that this input must come from the same component
-  - name: sensory data
+  - name: local sensory data
     requirements:
     - max_latency: 0 # means that this input must come from the same component
   - name: route
     requirements:
     - max_refresh: 1000 # ms
 
-communication:
+direct_communication:
   inputs:
-  - name: communication input
+  - name: direct comms
   outputs:
-  - name: communication output
+  - name: direct comms
 
-mediation:
+cloud_communication:
   inputs:
-  - name: communication input
+  - name: mediator comms
+  outputs:
+  - name: cloud comms
+
+mediation_service:
+  inputs:
+  - name: cloud comms
     cardinality: multiple
   - name: matching data
-  outputs:
-  - name: communication output
     cardinality: multiple
+  outputs:
+  - name: mediator comms
 
 sensor_service:
   outputs:
   - name: sensory data
+    requirements:        # This requirement does not put any restrictions on
+      - max_refresh: 100 # deployment rather, it guarantees some properties of
+                         # this software to other components.
 
 matching_service:
   inputs:
-  - name: client route data
-    cardinality: multiple
-  - name: car route data
-    cardinality: multiple
+    - name: client route data
+      cardinality: multiple
+    - name: car route data
+      cardinality: multiple
+  outputs:
+    - name: matching data

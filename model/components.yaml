@@ -1,51 +1,66 @@
 car_app:
   functionalities:
-  - steering
-  - location_service
-  - personal_sdp
-  - communication
+    - steering
+    - location_service_car
+    - personal_sdp
+    - direct_communication
   starting_state: urban
   states:
-  - name: urban
-    transitions:
-    - to: rural
-      condition: sensor_count < sc_threshold && closest_edge_distance > ced_threshold
-  - name: rural
-    functionalities:
-    - environment_sdp
-    transitions:
-    - to: urban
-      condition: sensor_count > sc_threshold || closest_edge_distance < ced_threshold
+    - name: urban
+      transitions:
+        - to: rural
+          condition: sensor_count < sc_threshold && closest_edge_distance > ced_threshold
+    - name: rural
+      functionalities:
+        - environment_sdp
+      transitions:
+        - to: urban
+          condition: sensor_count > sc_threshold || closest_edge_distance < ced_threshold
 
 client_app:
   functionalities:
-  - route_display
-  - communication
+    - route_display
+    - communication
   starting_state: autonomous
   states:
-  - name: autonomous
-    functionalities:
-    - location_service
-    transitions:
-    - to: riding
-      condition: communication.input.transition_to_riding
-  - name: riding
-    transitions:
-    - to: autonomous
-    condition: communication.input.transition_to_autonomous
+    - name: autonomous
+      functionalities:
+        - location_service_client
+        - cloud_communication
+      transitions:
+        - to: riding
+          condition: communication.input.transition_to_riding
+    - name: riding
+      functionalities:
+        - direct_communication
+      transitions:
+        - to: autonomous
+          condition: communication.input.transition_to_autonomous
 
 sensor_firmware:
   functionalities:
-  - sensor_service
+    - sensor_service
 
 sensing_server:
   functionalities:
-  - environment_sdp
+    - environment_sdp
+
+# The following components are microservices of which the server side of the
+# application is composed. Each of them executes strictly one functionality.
+# They are running in the center of the cloud (see datacenter hardware node).
 
 matching_server:
   functionalities:
-  - matching_service
+    - matching_service
 
 communication_server:
   functionalities:
-  - mediation
+    - mediation_service
+
+route_calculation_server_car:
+  functionalities:
+    - route_calculation_car
+
+route_calculation_server_client:
+  functionalities:
+    - route_calculation_car
