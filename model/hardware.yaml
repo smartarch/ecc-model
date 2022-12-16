@@ -20,7 +20,8 @@ cloud_edge_bridge:
     - name: center
     - name: edge
 
-# The following are the computing nodes
+# The nodes below are equipped with computational capabilities, and thus can
+# execute software components implemented for their platform.
 
 smartcar:
   owner: Company
@@ -55,6 +56,8 @@ datacenter:
     - name: internet
     - name: center
 
+# This node stands for essentially any network-connected smart city sensor
+# (e.g., a camera)
 smart_sensor:
   owner: any
   networks:

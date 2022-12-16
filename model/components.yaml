@@ -1,5 +1,6 @@
+# Software running on the smart car.
 car_app:
-  functionalities:
+  functionalities: # Functions that are always present, in any state:
     - steering
     - location_service_car
     - personal_sdp
@@ -7,20 +8,20 @@ car_app:
   starting_state: urban
   states:
     - name: urban
-      transitions:
-        - to: rural
+      transitions: # Possible transitions to other states and conditions under
+        - to: rural # they happen
           condition: sensor_count < sc_threshold && closest_edge_distance > ced_threshold
     - name: rural
-      functionalities:
+      functionalities: # Additional functions that are specific to this state:
         - environment_sdp
       transitions:
         - to: urban
           condition: sensor_count > sc_threshold || closest_edge_distance < ced_threshold
 
+# The application running on client smartphones.
 client_app:
   functionalities:
     - route_display
-    - communication
   starting_state: autonomous
   states:
     - name: autonomous
@@ -37,10 +38,14 @@ client_app:
         - to: autonomous
           condition: communication.input.transition_to_autonomous
 
+# This stands for software running on any smart city sensor, since the
+# distinctions between them are not substantial at this level of modeling.
 sensor_firmware:
   functionalities:
     - sensor_service
 
+# This component runs on edge servers, collecting and processing data from
+# smart city sensors.
 sensing_server:
   functionalities:
     - environment_sdp

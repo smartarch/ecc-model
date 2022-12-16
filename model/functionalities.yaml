@@ -1,24 +1,34 @@
+# NOTE: some requirements that would necessarily be present in
+
+# Provides the car with its current location. Can also provide those data to the
+# client when it is riding the car.
 location_service_car:
   outputs:
-  - name: car location data
-    cardinality: 2
+  - name: location data
+    cardinality: multiple # This means that this output can be sent to more
+                          # than one receiver. By default, unless specified
+                          # otherwise, the cardinality is "single"
     requirements: # input/output-level requirements
     - network:         # the data generated from this output can be handled only
         type: private  # over a trusted network
         owner: Company
 
-location_service_client:
-  outputs:
-  - name: client location data
-    cardinality: multiple
-
+# A service calculating the recommended route for a client, based on its
+# location and information about client-car matching.
 route_calculation_client:
   inputs:               # if connected to the location service above, this implies
-  - name: client location data # that this component can operate only over a trusted network
+  - name: location data # that this component can operate only over a trusted network
   - name: matching data
   outputs:           # if connected to the route display below, this implies that
   - name: client route data # this output must be sent at least every 100 ms
 
+# Provides the location data to the client when it is in an autonomous mode.
+location_service_client:
+  outputs:
+  - name: location data
+    cardinality: multiple
+
+# Displays the route data on the client's smartphone
 route_display:
   inputs:
   - name: client route data
@@ -28,6 +38,10 @@ route_display:
     - max_refresh: 100 ms # new input is required every 100 ms
       probability: 0.99
 
+# Environment sensory data processing. Aggregates and processes data coming from
+# smart city sensors in the local neighborhood. Can run on either an edge server
+# or a smart car, however requires the underlying hardware to be able to execute
+# a certain number of MADOPS per sensor.
 environment_sdp:
   inputs:
   - name: sensory data
@@ -39,6 +53,8 @@ environment_sdp:
    - MADOPS: 100000 * inputs.external_sensor.count # Dependent on the number
                                                    # of connected sensors
 
+# A service calculating the route of a car, based on its location, the data
+# from city sensors, and information about client-car matching.
 route_calculation_car:
   inputs:
   - name: car location data
@@ -48,11 +64,15 @@ route_calculation_car:
   - name: car route data
     cardinality: 2
 
+# Personal sensory data processing. This functionality aggregates and processes
+# all the data coming from the sensors installed in the car. The results arw
+# then supplied to the steering function to be used in decision-making.
 personal_sdp:
   outputs:
   - name: local sensory data
 
-# The latency
+# The core functionality of the smart car - steering the car based on all the
+# sensory data available.
 steering:
   inputs:
   - name: car location data
@@ -63,20 +83,25 @@ steering:
     - max_latency: 0 # means that this input must come from the same component
   - name: route
     requirements:
-    - max_refresh: 1000 # ms
+    - max_refresh: 1000 # This input does not have to be provided immediately
+                        # since it is not safety-critical
 
+# Direct client-car communication.
 direct_communication:
   inputs:
   - name: direct comms
   outputs:
   - name: direct comms
 
+# Client-car communication that happens through a service running in cloud.
 cloud_communication:
   inputs:
   - name: mediator comms
   outputs:
   - name: cloud comms
 
+# Service that can facilitate client-car communication when there is no direct
+# connection between them.
 mediation_service:
   inputs:
   - name: cloud comms
@@ -86,6 +111,9 @@ mediation_service:
   outputs:
   - name: mediator comms
 
+# The differences between the data provided by different kinds of sensors are
+# not essential in this model, thus there is only one functionality standing
+# for them
 sensor_service:
   outputs:
   - name: sensory data
@@ -93,6 +121,7 @@ sensor_service:
       - max_refresh: 100 # deployment rather, it guarantees some properties of
                          # this software to other components.
 
+# Matching clients to cars based on the information about their routes
 matching_service:
   inputs:
     - name: client route data

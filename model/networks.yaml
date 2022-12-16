@@ -1,14 +1,19 @@
 internet:
   type: public
 
+# Network operated by the mobile operator, through which it provides access
+# to the public Internet
 5G_network:
   type: public
   owner: Mobile Operator
 
+# Connects edge servers and edge devices with a low-latency connection.
 edge:
   type: private
   owner: Company A
 
+# Network connecting the servers of the datacenter(s). Has a higher latency to
+# the edge network(s), and thus to edge devices.
 center:
   type: private
   owner: Company A
